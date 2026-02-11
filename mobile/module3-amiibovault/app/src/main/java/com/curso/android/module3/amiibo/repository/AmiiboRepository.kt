@@ -181,6 +181,14 @@ class AmiiboRepository(
         return amiiboDao.getTotalCount()
     }
 
+    fun searchAmiibos(query: String): Flow<List<AmiiboEntity>> {
+        return if (query.isBlank()) {
+            amiiboDao.getAllAmiibos()
+        } else {
+            amiiboDao.searchAmiibos(query)
+        }
+    }
+
     /**
      * Verifica si hay más páginas disponibles.
      */
