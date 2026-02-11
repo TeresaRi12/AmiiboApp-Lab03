@@ -315,10 +315,10 @@ fun AmiiboListScreen(
             is AmiiboUiState.Error -> {
                 if (state.cachedAmiibos.isNotEmpty()) {
 
-                    LaunchedEffect(state.message) {
+                    LaunchedEffect(state) {
                         val result = snackbarHostState.showSnackbar(
                             message = state.message,
-                            actionLabel = if (state.isRetryable) "Retry" else null
+                            actionLabel = if (state.isRetryable) "Reintentar" else null
                         )
 
                         if (result == SnackbarResult.ActionPerformed) {

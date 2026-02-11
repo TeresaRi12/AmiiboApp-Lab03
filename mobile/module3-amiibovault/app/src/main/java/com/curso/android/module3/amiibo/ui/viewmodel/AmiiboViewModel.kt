@@ -445,8 +445,9 @@ class AmiiboViewModel(
                  * - Si es del servidor (Parse) → esperar y reintentar después
                  * - Si es local (Database) → reiniciar app o liberar espacio
                  */
-                    val cachedAmiibos = _loadedAmiibos.value
-                    val errorType = ErrorType.from(e)
+                val cachedAmiibos = repository.getAmiibosPage(0, _pageSize.value)
+
+                val errorType = ErrorType.from(e)
 
                     val isRetryable = when (e) {
                         is AmiiboError.Network -> true
