@@ -445,25 +445,33 @@ class AmiiboViewModel(
                  * - Si es del servidor (Parse) → esperar y reintentar después
                  * - Si es local (Database) → reiniciar app o liberar espacio
                  */
-                val cachedAmiibos = _loadedAmiibos.value
-                val errorType = ErrorType.from(e)
+                    val cachedAmiibos = _loadedAmiibos.value
+                    val errorType = ErrorType.from(e)
 
-                // Determinar si el error es recuperable con un reintento
-                val isRetryable = when (e) {
-                    is AmiiboError.Network -> true   // Puede mejorar la conexión
-                    is AmiiboError.Parse -> false    // Requiere fix en API/app
-                    is AmiiboError.Database -> true  // Puede liberarse espacio
-                    is AmiiboError.Unknown -> true   // Vale la pena reintentar
-                }
+                    val isRetryable = when (e) {
+                        is AmiiboError.Network -> true
+                        is AmiiboError.Parse -> false
+                        is AmiiboError.Database -> true
+                        is AmiiboError.Unknown -> true
+                    }
 
-                _uiState.value = AmiiboUiState.Error(
-                    message = e.message,
-                    errorType = errorType,
-                    isRetryable = isRetryable,
-                    cachedAmiibos = cachedAmiibos
-                )
-            } catch (e: Exception) {
-                // Catch-all para errores no tipados (no debería llegar aquí)
+                    if (cachedAmiibos.isNotEmpty()) {
+                        _uiState.value = AmiiboUiState.Error(
+                            message = e.message,
+                            errorType = errorType,
+                            isRetryable = isRetryable,
+                            cachedAmiibos = cachedAmiibos
+                        )
+                    } else {
+
+                        _uiState.value = AmiiboUiState.Error(
+                            message = e.message,
+                            errorType = errorType,
+                            isRetryable = isRetryable,
+                            cachedAmiibos = emptyList()
+                        )
+                    }
+                } catch (e: Exception) {
                 val cachedAmiibos = _loadedAmiibos.value
                 _uiState.value = AmiiboUiState.Error(
                     message = e.message ?: "Error desconocido al cargar datos",
