@@ -472,7 +472,9 @@ class AmiiboViewModel(
                         )
                     }
                 } catch (e: Exception) {
+
                 val cachedAmiibos = _loadedAmiibos.value
+
                 _uiState.value = AmiiboUiState.Error(
                     message = e.message ?: "Error desconocido al cargar datos",
                     errorType = ErrorType.UNKNOWN,
@@ -480,6 +482,7 @@ class AmiiboViewModel(
                     cachedAmiibos = cachedAmiibos
                 )
             }
+
         }
     }
 }

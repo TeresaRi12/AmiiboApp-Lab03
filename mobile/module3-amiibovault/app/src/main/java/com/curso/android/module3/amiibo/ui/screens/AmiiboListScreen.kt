@@ -74,6 +74,10 @@ import com.curso.android.module3.amiibo.domain.error.ErrorType
 import com.curso.android.module3.amiibo.ui.viewmodel.AmiiboUiState
 import com.curso.android.module3.amiibo.ui.viewmodel.AmiiboViewModel
 import org.koin.androidx.compose.koinViewModel
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+
 
 /**
  * ============================================================================
@@ -145,8 +149,13 @@ fun AmiiboListScreen(
 
     // Estado para el dropdown del tamaño de página
     var showPageSizeDropdown by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         topBar = {
             /**
              * TopAppBar de Material 3.
@@ -305,27 +314,29 @@ fun AmiiboListScreen(
              */
             is AmiiboUiState.Error -> {
                 if (state.cachedAmiibos.isNotEmpty()) {
-                    // Hay datos en cache: mostrar datos + mensaje de error
-                    Column(modifier = Modifier.padding(paddingValues)) {
-                        ErrorBanner(
+
+                    LaunchedEffect(state.message) {
+                        val result = snackbarHostState.showSnackbar(
                             message = state.message,
-                            errorType = state.errorType,
-                            isRetryable = state.isRetryable,
-                            onRetry = { viewModel.refreshAmiibos() }
+                            actionLabel = if (state.isRetryable) "Retry" else null
                         )
-                        AmiiboGrid(
-                            amiibos = state.cachedAmiibos,
-                            onAmiiboClick = onAmiiboClick,
-                            hasMorePages = false,
-                            isLoadingMore = false,
-                            paginationError = null,
-                            onLoadMore = {},
-                            onRetryLoadMore = {},
-                            modifier = Modifier.fillMaxSize()
-                        )
+
+                        if (result == SnackbarResult.ActionPerformed) {
+                            viewModel.refreshAmiibos()
+                        }
                     }
+
+                    AmiiboGrid(
+                        amiibos = state.cachedAmiibos,
+                        onAmiiboClick = onAmiiboClick,
+                        hasMorePages = false,
+                        isLoadingMore = false,
+                        paginationError = null,
+                        onLoadMore = {},
+                        onRetryLoadMore = {},
+                        modifier = Modifier.padding(paddingValues)
+                    )
                 } else {
-                    // Sin cache: pantalla de error completa
                     ErrorContent(
                         message = state.message,
                         errorType = state.errorType,
@@ -333,8 +344,10 @@ fun AmiiboListScreen(
                         onRetry = { viewModel.refreshAmiibos() },
                         modifier = Modifier.padding(paddingValues)
                     )
+
                 }
             }
+
         }
     }
 }
