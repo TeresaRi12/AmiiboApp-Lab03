@@ -9,13 +9,6 @@ import com.curso.android.module3.amiibo.data.local.entity.AmiiboDetailEntity
 import com.curso.android.module3.amiibo.data.local.entity.AmiiboEntity
 import kotlinx.coroutines.flow.Flow
 
-@Query("""
-    SELECT * FROM amiibos
-    WHERE name LIKE '%' || :query || '%'
-    ORDER BY name ASC
-""")
-fun searchAmiibos(query: String): Flow<List<AmiiboEntity>>
-
 /**
  * ============================================================================
  * AMIIBO DAO - Data Access Object (Room)
@@ -67,6 +60,13 @@ interface AmiiboDao {
      */
     @Query("SELECT * FROM amiibos ORDER BY name ASC")
     fun getAllAmiibos(): Flow<List<AmiiboEntity>>
+
+    @Query("""
+    SELECT * FROM amiibos
+    WHERE name LIKE '%' || :query || '%'
+    ORDER BY name ASC
+    """)
+    fun searchAmiibos(query: String): Flow<List<AmiiboEntity>>
 
     /**
      * =========================================================================

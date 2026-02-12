@@ -12,6 +12,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.update
+
 
 /**
  * ============================================================================
@@ -195,6 +199,14 @@ class AmiiboViewModel(
     private val _isLoadingMore = MutableStateFlow(false)
     val isLoadingMore: StateFlow<Boolean> = _isLoadingMore.asStateFlow()
 
+    // ===============================
+// BÚSQUEDA LOCAL
+// ===============================
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+
     /**
      * =========================================================================
      * ERROR DE PAGINACIÓN
@@ -271,6 +283,7 @@ class AmiiboViewModel(
         }
     }
 
+
     /**
      * =========================================================================
      * REFRESCAR AMIIBOS
@@ -304,6 +317,23 @@ class AmiiboViewModel(
             loadFirstPage()
         }
     }
+
+    fun onSearchQueryChange(query: String) {
+        _searchQuery.value = query
+    }
+
+    // Flow filtrado de Amiibos según el searchQuery
+    val filteredAmiibos: StateFlow<List<AmiiboEntity>> = _searchQuery
+        .debounce(300) // espera 300ms para no filtrar en cada tecla
+        .flatMapLatest { query ->
+            repository.searchAmiibos(query) // Llama al DAO a través del repo
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
 
     /**
      * Reinicia el estado de paginación.
