@@ -16,3 +16,14 @@ App Android que muestra Amiibos en un grid interactivo con Jetpack Compose y Mat
 
 
 ## Parte 2 – Búsqueda local
+- Búsqueda en Tiempo Real: Filtrar Amiibos a medida que el usuario escribe.
+- Persistencia Local: La búsqueda debe realizarse sobre la base de datos Room, no sobre una lista en memoria.
+- Reactividad: Uso de flujos (Flow) para actualizar la UI automáticamente.
+- Eficiencia: Implementar Debouncing para evitar consultas excesivas a la base de datos.
+- UX Consistente: Opción de limpiar la búsqueda y manejo inteligente de estados de error/vacíos.
+
+Link del video: https://youtu.be/Cm5t5fOx54E
+
+
+Con ayuda de IA pude agilizar parte del proyecto y la documentacion, asi como comprender mejor el funcionamiento de Android, 
+al igual que su estructura al hacer una app y en que carpetas colocarlas.
